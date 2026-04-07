@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Navbar -->
+<div th:replace="fragments/header :: navbar"></div>
+
+<main class="flex-fill container-fluid mt-4">
+    
+    <!-- Mensajes de éxito/error -->
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0"><i class="bi bi-box-seam"></i> Lista de Productos</h3>
+            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalProducto" onclick="limpiarFormulario()">
+                <i class="bi bi-plus-circle"></i> Nuevo Producto
+            </button>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador y filtros -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por SKU, nombre o código de barras..." onkeyup="filtrarTabla()">
+                        <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('searchInput').value=''; filtrarTabla();">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 text-end">
+                    <span class="badge bg-info fs-6">Total: <span id="totalRegistros" th:text="${#lists.size(lstProductos)}">0</span></span>
+                </div>
+            </div>
+
+            <!-- Tabla de productos -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm" id="tablaProductos">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>SKU</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Unidad</th>
+                            <th>Código Barras</th>
+                            <th class="text-end">Precio Lista</th>
+                            <th class="text-center">Estado</th>
+                            <th>Creado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(lstProductos)}">
+                            <td colspan="10" class="text-center text-muted">No hay productos registrados</td>
+                        </tr>
+                        <tr th:each="producto : ${lstProductos}">
+                            <td th:text="${producto.id}">1</td>
+                            <td>
+                                <span class="badge bg-dark" 
+                                      th:text="${producto.sku}"
+                                      th:attr="data-sku=${producto.sku}">BEB-001</span>
+                            </td>
+                            <td th:text="${producto.nombre}">Agua Mineral 500ml</td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${producto.categoriaNombre}">Bebidas</span>
+                            </td>
+                            <td th:text="${producto.unidadNombre}">Unidad</td>
+                            <td>
+                                <small class="text-muted" th:text="${producto.codigoBarras != null ? producto.codigoBarras : '-'}">123456789</small>
+                            </td>
+                            <td class="text-end">
+                                <strong th:text="${producto.precioLista != null ? 'S/ ' + #numbers.formatDecimal(producto.precioLista, 1, 2) : '-'}">S/ 2.50</strong>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${producto.activo}" class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Activo
+                                </span>
+                                <span th:unless="${producto.activo}" class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Inactivo
+                                </span>
+                            </td>
+                            <td th:text="${#temporals.format(producto.creadoEn, 'dd/MM/yyyy')}">01/11/2025</td>
+                            <td class="text-center">
+                                <!-- Botón Editar -->
+                                <button class="btn btn-sm btn-warning btn-editar" 
+                                        th:data-id="${producto.id}"
+                                        th:data-sku="${producto.sku}"
+                                        th:data-nombre="${producto.nombre}"
+                                        th:data-descripcion="${producto.descripcion}"
+                                        th:data-categoria-id="${producto.categoriaId}"
+                                        th:data-codigo-barras="${producto.codigoBarras}"
+                                        th:data-precio-lista="${producto.precioLista}"
+                                        th:data-activo="${producto.activo}"
+                                        th:data-unidad-id="${producto.unidadId}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalProducto">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                
+                                <!-- Botón Eliminar -->
+                                <a th:href="@{/productos/eliminar/{id}(id=${producto.id})}" 
+                                   class="btn btn-sm btn-danger btn-eliminar"
+                                   th:data-nombre="${producto.nombre}"
+                                   th:data-sku="${producto.sku}">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal para Crear/Editar Producto -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-labelledby="modalProductoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form id="formProducto" th:action="@{/productos/guardar}" method="post">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="modalProductoLabel">
+                        <i class="bi bi-box-seam"></i> Nuevo Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- Campo oculto para ID (solo para edición) -->
+                    <input type="hidden" id="productoId" name="id">
+                    
+                    <div class="row">
+                        <!-- SKU -->
+                        <div class="col-md-4 mb-3">
+                            <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sku" name="sku" required maxlength="30" placeholder="Ej: BEB-001">
+                            <small class="form-text text-muted">Código único del producto</small>
+                        </div>
+                        
+                        <!-- Nombre -->
+                        <div class="col-md-8 mb-3">
+                            <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="120" placeholder="Ej: Agua Mineral 500ml">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Descripción -->
+                        <div class="col-md-12 mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="2" maxlength="500" placeholder="Descripción detallada del producto"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Categoría -->
+                        <div class="col-md-4 mb-3">
+                            <label for="categoriaId" class="form-label">Categoría <span class="text-danger">*</span></label>
+                            <select class="form-select" id="categoriaId" name="categoriaId" required>
+                                <option value="">Seleccione categoría</option>
+                                <option th:each="categoria : ${lstCategorias}" 
+                                        th:value="${categoria.id}" 
+                                        th:text="${categoria.nombre}">
+                                    Categoría
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <!-- Unidad -->
+                        <div class="col-md-4 mb-3">
+                            <label for="unidadId" class="form-label">Unidad de Medida <span class="text-danger">*</span></label>
+                            <select class="form-select" id="unidadId" name="unidadId" required>
+                                <option value="">Seleccione unidad</option>
+                                <option th:each="unidad : ${lstUnidades}" 
+                                        th:value="${unidad.id}" 
+                                        th:text="${unidad.nombre + ' (' + unidad.codigo + ')'}">
+                                    Unidad (UND)
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <!-- Código de Barras -->
+                        <div class="col-md-4 mb-3">
+                            <label for="codigoBarras" class="form-label">Código de Barras</label>
+                            <input type="text" class="form-control" id="codigoBarras" name="codigoBarras" maxlength="50" placeholder="Ej: 123456789001">
+                            <small class="form-text text-muted">Opcional</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Precio Lista -->
+                        <div class="col-md-6 mb-3">
+                            <label for="precioLista" class="form-label">Precio de Lista</label>
+                            <div class="input-group">
+                                <span class="input-group-text">S/</span>
+                                <input type="number" class="form-control" id="precioLista" name="precioLista" 
+                                       step="0.01" min="0.01" placeholder="0.00">
+                            </div>
+                            <small class="form-text text-muted">Precio de referencia</small>
+                        </div>
+                        
+                        <!-- Estado Activo -->
+                        <div class="col-md-6 mb-3 d-flex align-items-center">
+                            <div class="form-check form-switch mt-4">
+                                <input type="hidden" name="activo" value="false">
+                                <input class="form-check-input" type="checkbox" id="activo" name="activo" value="true" checked>
+                                <label class="form-check-label" for="activo">
+                                    <i class="bi bi-check-circle"></i> Producto Activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ayuda contextual -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> <strong>Información:</strong><br>
+                        - El <strong>SKU</strong> debe ser único para cada producto<br>
+                        - La <strong>categoría</strong> y <strong>unidad</strong> son obligatorias<br>
+                        - El <strong>código de barras</strong> y <strong>precio</strong> son opcionales
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-info text-white">
+                        <i class="bi bi-save"></i> Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Scripts personalizados -->
+<script th:inline="javascript">
+    // Función para filtrar la tabla - CORREGIDA
+    function filtrarTabla() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById('tablaProductos');
+        const tr = table.getElementsByTagName('tr');
+        let count = 0;
+
+        for (let i = 1; i < tr.length; i++) {
+            const tdSku = tr[i].getElementsByTagName('td')[1];
+            const tdNombre = tr[i].getElementsByTagName('td')[2];
+            const tdCodigoBarras = tr[i].getElementsByTagName('td')[5];
+            
+            if (tdSku && tdNombre && tdCodigoBarras) {
+                const badge = tdSku.querySelector('.badge');
+                const txtSku = badge ? badge.getAttribute('data-sku') : (tdSku.textContent || tdSku.innerText);
+                const txtNombre = tdNombre.textContent || tdNombre.innerText;
+                const txtCodigoBarras = tdCodigoBarras.textContent || tdCodigoBarras.innerText;
+                
+                // Filtro por texto
+                if (txtSku.toUpperCase().indexOf(filter) > -1 || 
+                    txtNombre.toUpperCase().indexOf(filter) > -1 ||
+                    txtCodigoBarras.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                    count++;
+                } else {
+                    tr[i].style.display = 'none';
+                }
+            }
+        }
+        
+        document.getElementById('totalRegistros').textContent = count;
+    }
+
+    // Función para limpiar el formulario (nuevo producto)
+    function limpiarFormulario() {
+        document.getElementById('formProducto').action = '/productos/guardar';
+        document.getElementById('modalProductoLabel').innerHTML = '<i class="bi bi-box-seam"></i> Nuevo Producto';
+        document.getElementById('productoId').value = '';
+        document.getElementById('sku').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('categoriaId').value = '';
+        document.getElementById('unidadId').value = '';
+        document.getElementById('codigoBarras').value = '';
+        document.getElementById('precioLista').value = '';
+        document.getElementById('activo').checked = true;
+    }
+
+    // Event listener para botones de editar
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-editar').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const sku = this.getAttribute('data-sku');
+                const nombre = this.getAttribute('data-nombre');
+                const descripcion = this.getAttribute('data-descripcion');
+                const categoriaId = this.getAttribute('data-categoria-id');
+                const codigoBarras = this.getAttribute('data-codigo-barras');
+                const precioLista = this.getAttribute('data-precio-lista');
+                const activo = this.getAttribute('data-activo') === 'true';
+                const unidadId = this.getAttribute('data-unidad-id');
+                
+                // Actualizar formulario para modo edición
+                document.getElementById('formProducto').action = '/productos/actualizar';
+                document.getElementById('modalProductoLabel').innerHTML = '<i class="bi bi-pencil"></i> Editar Producto';
+                document.getElementById('productoId').value = id;
+                document.getElementById('sku').value = sku;
+                document.getElementById('nombre').value = nombre;
+                document.getElementById('descripcion').value = descripcion !== 'null' ? descripcion : '';
+                document.getElementById('categoriaId').value = categoriaId;
+                document.getElementById('unidadId').value = unidadId;
+                document.getElementById('codigoBarras').value = codigoBarras !== 'null' ? codigoBarras : '';
+                document.getElementById('precioLista').value = precioLista !== 'null' ? precioLista : '';
+                document.getElementById('activo').checked = activo;
+            });
+        });
+
+        // Event listener para botones de eliminar con confirmación
+        document.querySelectorAll('.btn-eliminar').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                const nombre = this.getAttribute('data-nombre');
+                const sku = this.getAttribute('data-sku');
+                if (!confirm('¿Está seguro de eliminar este producto?\n\nSKU: ' + sku + '\nNombre: ' + nombre)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+
+    // Auto-ocultar mensajes después de 5 segundos
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert-dismissible');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+
+</body>
+</html>

@@ -1,92 +1,102 @@
-# 📦 Distribuidora Andina SAC - Sistema ERP de Gestión de Inventarios
+🚀 ERP de Inventarios - Distribuidora Andina SAC
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen)](https://spring.io/projects/spring-boot)
-[![Java](https://img.shields.io/badge/Java-17-orange)](https://www.oracle.com/java/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)](https://www.mysql.com/)
+Sistema web de gestión de inventarios (ERP) desarrollado con Java + Spring Boot, orientado al control de productos, almacenes y movimientos de stock en tiempo real.
 
-Este proyecto es una solución integral para la gestión de inventarios y distribución de productos (ERP), desarrollada con **Spring Boot 3**. Implementa una arquitectura robusta para el control de almacenes, stock, productos y movimientos de inventario.
+💡 Proyecto académico con enfoque profesional, aplicando buenas prácticas de arquitectura backend.
 
-## 🚀 Características del Sistema
+📌 Descripción
 
-- **Gestión de Inventario:** Control de stock mínimo, máximo y actual por almacén.
-- **Movimientos:** Registro detallado de entradas y salidas de productos.
-- **Catálogo ERP:** Administración de productos, categorías y unidades de medida.
-- **Seguridad:** Control de acceso basado en sesiones y roles de usuario.
-- **Dashboard Web:** Interfaz administrativa amigable desarrollada con Thymeleaf.
-- **API REST:** Endpoints listos para ser consumidos por aplicaciones externas.
+Este sistema permite a una empresa de distribución gestionar su inventario de manera eficiente, controlando:
 
-## 🛠️ Stack Tecnológico
+Productos y categorías
+Stock por almacén
+Movimientos (entradas y salidas)
+Control de acceso por roles
 
-- **Lenguaje:** Java 17.
-- **Framework Principal:** Spring Boot 3.5.7.
-- **Persistencia:** Spring Data JPA / Hibernate.
-- **Base de Datos:** MySQL 8.
-- **Mapeo DTO:** MapStruct (para una conversión eficiente entre Entidades y DTOs).
-- **Vistas:** Thymeleaf + HTML5 + CSS3.
-- **Utilidades:** Lombok, Jackson Annotations.
-- **Gestor de Dependencias:** Maven.
+Incluye tanto una API REST como una interfaz web para administración.
 
-## 📋 Requisitos Previos
+🧠 Funcionalidades principales
+📦 Gestión completa de productos y categorías
+🏬 Control de inventario por almacén
+🔄 Registro de movimientos de stock (entrada/salida)
+🔐 Autenticación y autorización basada en roles
+📊 Dashboard administrativo con Thymeleaf
+🔗 API REST para integración con otros sistemas
+🛠�?Stack tecnológico
+Lenguaje: Java 17
+Framework: Spring Boot 3
+Persistencia: Spring Data JPA / Hibernate
+Base de datos: MySQL 8
+Mapeo: MapStruct
+Frontend: Thymeleaf + HTML + CSS
+Utilidades: Lombok, Jackson
+Build tool: Maven
+🏗�?Arquitectura
 
-- **Java Development Kit (JDK) 17** o superior.
-- **MySQL Server 8.0** o superior.
-- **Maven** (opcional, se incluye Maven Wrapper).
+El proyecto sigue una arquitectura en capas:
 
-## 🔧 Configuración e Instalación
+controller �?manejo de peticiones (REST y MVC)
+service �?lógica de negocio
+repository �?acceso a datos
+entity �?modelo de datos
+mapper �?conversión DTO �?entidad
+exception �?manejo global de errores
+⚙️ Ejecución del proyecto
+🔧 Requisitos
+JDK 17 o superior
+MySQL 8
+Maven (o usar Maven Wrapper incluido)
+🚀 Pasos
+Crear base de datos en MySQL:
+CREATE DATABASE erp_productos;
+Ejecutar script SQL:
+src/main/resources/db/Script.sql
+Configurar credenciales en:
+src/main/resources/application.properties
 
-### 1. Preparar la Base de Datos
-1. Abre tu gestor de MySQL (Workbench, CLI, etc.).
-2. Crea la base de datos:
-   ```sql
-   CREATE DATABASE erp_productos;
-   ```
-3. Ejecuta el script de creación de tablas y datos iniciales ubicado en:
-   `src/main/resources/db/Script.sql`
+Ejemplo:
 
-### 2. Configurar la Aplicación
-Edita el archivo `src/main/resources/application.properties` con tus credenciales locales:
-```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/erp_productos?useSSL=false&serverTimezone=America/Lima
 spring.datasource.username=tu_usuario
 spring.datasource.password=tu_password
-```
-
-### 3. Ejecutar el Proyecto
-Desde la terminal en la carpeta raíz del proyecto:
-```bash
-# Si usas Windows
-./mvnw.cmd spring-boot:run
-
-# Si usas Linux/macOS
+Ejecutar el proyecto:
 ./mvnw spring-boot:run
-```
 
-## 📂 Estructura del Proyecto
+(En Windows usar mvnw.cmd)
 
-```text
-Distribuidora_Andina_sac/
-├── src/main/java/pe/com/andinadistribuidora/
-│   ├── api/             # Controladores (MVC y REST) y DTOs
-│   ├── entity/          # Entidades JPA (Modelo de datos)
-│   ├── service/         # Lógica de negocio (Interfaces e Impl)
-│   ├── repository/      # Interfaces de acceso a datos (JPA)
-│   ├── mapper/          # Mapeadores MapStruct
-│   └── exception/       # Manejo global de errores
-├── src/main/resources/
-│   ├── db/              # Script de base de datos (Script.sql) ⬅️
-│   ├── templates/       # Vistas HTML (Thymeleaf)
-│   ├── static/          # Recursos estáticos (CSS, JS)
-│   └── application.properties
-├── Andina SAC.postman_collection.json # Pruebas de API
-└── pom.xml              # Configuración de Maven
-```
+📡 Endpoints principales
+/api/productos
+/api/almacenes
+/api/inventarios
+/api/movimientos
 
-## 🧪 Pruebas de API
-Se incluye el archivo `Andina SAC.postman_collection.json` en la raíz. Importalo en **Postman** para probar los endpoints de:
-- `/api/almacenes`
-- `/api/productos`
-- `/api/inventarios`
-- `/api/movimientos`
+📁 Se incluye colección de Postman para pruebas.
 
----
-⌨️ Desarrollado para el curso de **Lenguaje de Programación II**
+📸 Capturas del sistema
+
+👉 Agrega aquí screenshots del sistema (muy importante para reclutadores)
+Ejemplo:
+
+Dashboard
+Gestión de productos
+Inventario
+Postman
+🎯 Aprendizajes clave
+Desarrollo de aplicaciones empresariales con Spring Boot
+Diseño de APIs REST
+Manejo de bases de datos relacionales con JPA
+Implementación de arquitectura en capas
+Seguridad básica con roles
+Separación de responsabilidades (DTO, Mapper, Service)
+📌 Estado del proyecto
+
+✔️ Funcional en entorno local
+🔄 Posible mejora: despliegue en la nube (Render / Railway)
+
+👨‍�?Autor
+
+Jason Dávila Delgado
+Estudiante de Computación e Informática
+
+🔗 GitHub: https://github.com/JasonDavD
+🔗 LinkedIn: https://www.linkedin.com/in/jasondavd/

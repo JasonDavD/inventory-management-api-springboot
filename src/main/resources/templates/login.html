@@ -51,7 +51,7 @@
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <span th:text="${error}"></span>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="this.parentElement.remove()" aria-label="Cerrar"></button>
         </div>
 
         <!-- Mensaje de éxito -->
@@ -60,7 +60,7 @@
             <path d="M20 6L9 17l-5-5"/>
           </svg>
           <span th:text="${mensaje}"></span>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="this.parentElement.remove()" aria-label="Cerrar"></button>
         </div>
 
         <!-- Formulario -->

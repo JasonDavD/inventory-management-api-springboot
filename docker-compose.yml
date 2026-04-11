@@ -1,0 +1,61 @@
+services:
+
+  # ─────────────────────────────────────────────
+  # Servicio: Base de datos MySQL 8
+  # ─────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: erp_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: erp_productos
+      MYSQL_USER: erp_user
+      MYSQL_PASSWORD: erp_pass
+    ports:
+      - "3307:3306"          # Puerto 3307 en el host para no chocar con MySQL local
+    volumes:
+      - mysql_data:/var/lib/mysql                          # Datos persistentes
+      - ./src/main/resources/db/Script.sql:/docker-entrypoint-initdb.d/Script.sql:ro  # Script inicial
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - erp_network
+
+  # ─────────────────────────────────────────────
+  # Servicio: Aplicación Spring Boot
+  # ─────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/erp_productos?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: erp_user
+      SPRING_DATASOURCE_PASSWORD: erp_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none       # El SQL del script ya crea las tablas
+      SPRING_JPA_SHOW_SQL: "false"
+    ports:
+      - "8080:8080"
+    networks:
+      - erp_network
+
+# ─────────────────────────────────────────────
+# Volúmenes y redes
+# ─────────────────────────────────────────────
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  erp_network:
+    driver: bridge

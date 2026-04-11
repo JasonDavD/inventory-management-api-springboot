@@ -6,15 +6,15 @@ USE erp_productos;
 -- TABLAS DE USUARIOS Y ROLES (Adaptadas)
 -- ===================================================
 
-CREATE TABLE Rol (
+CREATE TABLE rol (
     idrol INT AUTO_INCREMENT PRIMARY KEY,
     descripcion VARCHAR(30) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 -- ========================================
--- TABLA USUARIO (Sistema de autenticación)
+-- TABLA usuario (Sistema de autenticación)
 -- ========================================
-CREATE TABLE Usuario (
+CREATE TABLE usuario (
     idusu INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE Usuario (
     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Añadido campo 'creado_en' para consistencia
     
     CONSTRAINT FK_RolUsuario FOREIGN KEY (idrol) 
-        REFERENCES Rol(idrol) -- Corregido: REFERENCIAS a la tabla 'Rol'
+        REFERENCES rol(idrol) -- Corregido: REFERENCIAS a la tabla 'rol'
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -34,16 +34,16 @@ CREATE TABLE Usuario (
 -- ===================================================
 
 -- Inserción de Roles
-INSERT INTO Rol (descripcion) VALUES
+INSERT INTO rol (descripcion) VALUES
 ('ADMIN'),
 ('ALMACENERO');
 
--- Inserción de Usuarios (los IDs de rol se obtienen de la tabla Rol)
-INSERT INTO Usuario (nombre, apellido, usuario, password, idrol, activo) VALUES
+-- Inserción de Usuarios (los IDs de rol se obtienen de la tabla rol)
+INSERT INTO usuario (nombre, apellido, usuario, password, idrol, activo) VALUES
 ('Administrador', 'General', 'admin', '1234', 
-    (SELECT idrol FROM Rol WHERE descripcion = 'ADMIN'), 1),
+    (SELECT idrol FROM rol WHERE descripcion = 'ADMIN'), 1),
 ('Juan', 'Pérez', 'almacenero', 'abcd', 
-    (SELECT idrol FROM Rol WHERE descripcion = 'ALMACENERO'), 1);
+    (SELECT idrol FROM rol WHERE descripcion = 'ALMACENERO'), 1);
 
 -- ===================================================
 -- CATEGORÍAS
@@ -186,11 +186,3 @@ CREATE TABLE inventario_movimiento (
     FOREIGN KEY (producto_id) REFERENCES producto (producto_id)
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
-
-SELECT * FROM unidad;
-SELECT * FROM usuario;
-SELECT * FROM rol;
-SELECT * FROM categoria;
-SELECT * FROM producto;
-SELECT * FROM almacen;
-SELECT * FROM inventario;

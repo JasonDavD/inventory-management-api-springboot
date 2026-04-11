@@ -22,7 +22,7 @@ Incluye tanto una API REST como una interfaz web para administración.
 🔐 Autenticación y autorización basada en roles
 📊 Dashboard administrativo con Thymeleaf
 🔗 API REST para integración con otros sistemas
-🛠�?Stack tecnológico
+🛠️ Stack tecnológico
 Lenguaje: Java 17
 Framework: Spring Boot 3
 Persistencia: Spring Data JPA / Hibernate
@@ -31,16 +31,16 @@ Mapeo: MapStruct
 Frontend: Thymeleaf + HTML + CSS
 Utilidades: Lombok, Jackson
 Build tool: Maven
-🏗�?Arquitectura
+🏗️ Arquitectura
 
 El proyecto sigue una arquitectura en capas:
 
-controller �?manejo de peticiones (REST y MVC)
-service �?lógica de negocio
-repository �?acceso a datos
-entity �?modelo de datos
-mapper �?conversión DTO �?entidad
-exception �?manejo global de errores
+controller → manejo de peticiones (REST y MVC)
+service → lógica de negocio
+repository → acceso a datos
+entity → modelo de datos
+mapper → conversión DTO ↔ entidad
+exception → manejo global de errores
 ⚙️ Ejecución del proyecto
 🔧 Requisitos
 JDK 17 o superior
@@ -93,7 +93,7 @@ Separación de responsabilidades (DTO, Mapper, Service)
 ✔️ Funcional en entorno local
 🔄 Posible mejora: despliegue en la nube (Render / Railway)
 
-👨‍�?Autor
+👨‍💻 Autor
 
 Jason Dávila Delgado
 Estudiante de Computación e Informática

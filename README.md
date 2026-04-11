@@ -205,7 +205,7 @@ mvnw.cmd spring-boot:run      # Windows
 ## 👨‍💻 Autor
 
 **Jason Dávila Delgado**  
-Estudiante de Computación e Informática
+Full Stack Developer
 
 [![GitHub](https://img.shields.io/badge/GitHub-JasonDavD-181717?logo=github)](https://github.com/JasonDavD)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-jasondavd-0A66C2?logo=linkedin)](https://www.linkedin.com/in/jasondavd/)

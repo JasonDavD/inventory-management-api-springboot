@@ -74,6 +74,10 @@ Ejecutar el proyecto:
 
 📸 Capturas del sistema
 
+<img width="886" height="411" alt="image" src="https://github.com/user-attachments/assets/92e00f6f-71c8-4c21-8a78-23b01721e8c2" />
+
+<img width="886" height="413" alt="image" src="https://github.com/user-attachments/assets/bde08dac-31a6-4d52-9fc0-f53ed315634e" />
+
 👉 Agrega aquí screenshots del sistema (muy importante para reclutadores)
 Ejemplo:
 

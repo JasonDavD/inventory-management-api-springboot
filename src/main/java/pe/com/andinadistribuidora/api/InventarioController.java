@@ -1,6 +1,5 @@
 package pe.com.andinadistribuidora.api;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,18 +21,13 @@ import pe.com.andinadistribuidora.service.ProductoService;
 @RequestMapping("/inventario")
 @RequiredArgsConstructor
 public class InventarioController {
-    
+
     private final InventarioService inventarioService;
     private final AlmacenService almacenService;
     private final ProductoService productoService;
-    
+
     @GetMapping
-    public String listar(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
+    public String listar(Model model) {
         model.addAttribute("lstInventario", inventarioService.listar());
         model.addAttribute("lstAlmacenes", almacenService.listar());
         model.addAttribute("lstProductos", productoService.listar());
@@ -42,16 +36,10 @@ public class InventarioController {
         model.addAttribute("inventarioRequestDto", new InventarioRequestDto());
         return "listInventario.html";
     }
-    
+
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute InventarioRequestDto inventarioRequestDto, 
-                         HttpSession session,
+    public String guardar(@ModelAttribute InventarioRequestDto inventarioRequestDto,
                          RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             inventarioService.crear(inventarioRequestDto);
             redirectAttributes.addFlashAttribute("mensaje", "Inventario creado exitosamente");
@@ -59,21 +47,14 @@ public class InventarioController {
             log.error("Error al crear inventario: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/inventario";
     }
-    
+
     @GetMapping("/editar/{almacenId}/{productoId}")
     public String editar(@PathVariable Integer almacenId,
                         @PathVariable Integer productoId,
-                        HttpSession session,
                         RedirectAttributes redirectAttributes,
                         Model model) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             model.addAttribute("inventarioRequestDto", inventarioService.obtener(almacenId, productoId));
             model.addAttribute("lstInventario", inventarioService.listar());
@@ -85,27 +66,19 @@ public class InventarioController {
             redirectAttributes.addFlashAttribute("error", "Inventario no encontrado");
             return "redirect:/inventario";
         }
-        
         return "listInventario";
     }
-    
+
     @PostMapping("/actualizar")
     public String actualizar(@ModelAttribute InventarioRequestDto inventarioRequestDto,
-                           HttpSession session,
                            RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             if (inventarioRequestDto.getAlmacenId() == null || inventarioRequestDto.getProductoId() == null) {
                 throw new IllegalArgumentException("El almacén y producto son obligatorios");
             }
-            
             inventarioService.actualizar(
-                inventarioRequestDto.getAlmacenId(), 
-                inventarioRequestDto.getProductoId(), 
+                inventarioRequestDto.getAlmacenId(),
+                inventarioRequestDto.getProductoId(),
                 inventarioRequestDto
             );
             redirectAttributes.addFlashAttribute("mensaje", "Inventario actualizado exitosamente");
@@ -113,20 +86,13 @@ public class InventarioController {
             log.error("Error al actualizar inventario: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/inventario";
     }
-    
+
     @GetMapping("/eliminar/{almacenId}/{productoId}")
     public String eliminar(@PathVariable Integer almacenId,
                           @PathVariable Integer productoId,
-                          HttpSession session,
                           RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             inventarioService.eliminar(almacenId, productoId);
             redirectAttributes.addFlashAttribute("mensaje", "Inventario eliminado exitosamente");
@@ -134,21 +100,13 @@ public class InventarioController {
             log.error("Error al eliminar inventario almacen={}, producto={}: {}", almacenId, productoId, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/inventario";
     }
-    
+
     @GetMapping("/almacen/{almacenId}")
     public String listarPorAlmacen(@PathVariable Integer almacenId,
-                                   HttpSession session,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
         try {
             model.addAttribute("lstInventario", inventarioService.listarPorAlmacen(almacenId));
             model.addAttribute("lstAlmacenes", almacenService.listar());
@@ -162,18 +120,11 @@ public class InventarioController {
             return "redirect:/inventario";
         }
     }
-    
+
     @GetMapping("/producto/{productoId}")
     public String listarPorProducto(@PathVariable Integer productoId,
-                                    HttpSession session,
                                     Model model,
                                     RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
         try {
             model.addAttribute("lstInventario", inventarioService.listarPorProducto(productoId));
             model.addAttribute("lstAlmacenes", almacenService.listar());
@@ -187,15 +138,9 @@ public class InventarioController {
             return "redirect:/inventario";
         }
     }
-    
+
     @GetMapping("/stock-bajo")
-    public String stockBajo(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
+    public String stockBajo(Model model) {
         model.addAttribute("lstInventario", inventarioService.listarStockBajo());
         model.addAttribute("lstAlmacenes", almacenService.listar());
         model.addAttribute("lstProductos", productoService.listar());
@@ -203,15 +148,9 @@ public class InventarioController {
         model.addAttribute("inventarioRequestDto", new InventarioRequestDto());
         return "listInventario";
     }
-    
+
     @GetMapping("/stock-critico")
-    public String stockCritico(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
+    public String stockCritico(Model model) {
         model.addAttribute("lstInventario", inventarioService.listarStockCritico());
         model.addAttribute("lstAlmacenes", almacenService.listar());
         model.addAttribute("lstProductos", productoService.listar());

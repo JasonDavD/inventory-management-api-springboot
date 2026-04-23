@@ -18,6 +18,4 @@ public interface UsuarioService {
     List<UsuarioResponseDto> listar();
     
     List<UsuarioResponseDto> listarPorRol(Integer idRol);
-    
-    UsuarioResponseDto autenticar(String usuario, String password);
 }

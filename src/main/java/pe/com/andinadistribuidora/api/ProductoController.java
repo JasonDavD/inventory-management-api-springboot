@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pe.com.andinadistribuidora.api.request.ProductoRequestDto;
@@ -22,38 +21,23 @@ import pe.com.andinadistribuidora.service.UnidadService;
 @RequestMapping("/productos")
 @RequiredArgsConstructor
 public class ProductoController {
-    
+
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
     private final UnidadService unidadService;
-    
-    // --- 1. LISTAR PRODUCTOS ---
+
     @GetMapping
-    public String listar(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        // Verificar autenticación
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
+    public String listar(Model model) {
         model.addAttribute("lstProductos", productoService.listar());
         model.addAttribute("lstCategorias", categoriaService.listar());
         model.addAttribute("lstUnidades", unidadService.listar());
         model.addAttribute("productoRequestDto", new ProductoRequestDto());
         return "listProducto";
     }
-    
-    // --- 2. CREAR PRODUCTO ---
+
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute ProductoRequestDto productoRequestDto, 
-                         HttpSession session,
-                         RedirectAttributes redirectAttributes,
-                         Model model) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
+    public String guardar(@ModelAttribute ProductoRequestDto productoRequestDto,
+                         RedirectAttributes redirectAttributes) {
         try {
             productoService.crear(productoRequestDto);
             redirectAttributes.addFlashAttribute("mensaje", "Producto creado exitosamente");
@@ -61,21 +45,13 @@ public class ProductoController {
             log.error("Error al crear producto: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/productos";
     }
-    
-    // --- 3. EDITAR PRODUCTO (mostrar datos en formulario) ---
+
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Integer id, 
-                        HttpSession session,
+    public String editar(@PathVariable Integer id,
                         RedirectAttributes redirectAttributes,
                         Model model) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             model.addAttribute("productoRequestDto", productoService.obtener(id));
             model.addAttribute("lstProductos", productoService.listar());
@@ -87,46 +63,28 @@ public class ProductoController {
             redirectAttributes.addFlashAttribute("error", "Producto no encontrado");
             return "redirect:/productos";
         }
-        
         return "crudproductos";
     }
-    
-    // --- 4. ACTUALIZAR PRODUCTO ---
+
     @PostMapping("/actualizar")
     public String actualizar(@ModelAttribute ProductoRequestDto productoRequestDto,
-                           HttpSession session,
                            RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
-            // El ID debe venir en el DTO
             if (productoRequestDto.getId() == null) {
                 throw new IllegalArgumentException("El ID del producto es obligatorio");
             }
-            
             productoService.actualizar(productoRequestDto.getId(), productoRequestDto);
             redirectAttributes.addFlashAttribute("mensaje", "Producto actualizado exitosamente");
         } catch (Exception e) {
             log.error("Error al actualizar producto: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/productos";
     }
-    
-    // --- 5. ELIMINAR PRODUCTO ---
+
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id,
-                          HttpSession session,
                           RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             productoService.eliminar(id);
             redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
@@ -134,7 +92,6 @@ public class ProductoController {
             log.error("Error al eliminar producto {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/productos";
     }
 }

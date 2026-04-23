@@ -38,11 +38,16 @@ INSERT INTO rol (descripcion) VALUES
 ('ADMIN'),
 ('ALMACENERO');
 
--- Inserción de Usuarios (los IDs de rol se obtienen de la tabla rol)
+-- Inserción de Usuarios
+-- Contraseñas codificadas con BCrypt (cost=10):
+--   admin      -> 1234
+--   almacenero -> abcd
 INSERT INTO usuario (nombre, apellido, usuario, password, idrol, activo) VALUES
-('Administrador', 'General', 'admin', '1234', 
+('Administrador', 'General', 'admin',
+    '$2b$10$MmIhW1U/JMYQTOcb7qk.BemFzDI7ZroqAWSq1ieeM46wdXeiQgp26',
     (SELECT idrol FROM rol WHERE descripcion = 'ADMIN'), 1),
-('Juan', 'Pérez', 'almacenero', 'abcd', 
+('Juan', 'Pérez', 'almacenero',
+    '$2b$10$fPDlFiAcowYak4U92AxMluM.He1y4DK8kU.lgyUIadb1sDRILexxq',
     (SELECT idrol FROM rol WHERE descripcion = 'ALMACENERO'), 1);
 
 -- ===================================================

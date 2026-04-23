@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pe.com.andinadistribuidora.api.request.UnidadRequestDto;
@@ -20,32 +19,19 @@ import pe.com.andinadistribuidora.service.UnidadService;
 @RequestMapping("/unidades")
 @RequiredArgsConstructor
 public class UnidadController {
-    
+
     private final UnidadService unidadService;
-    
+
     @GetMapping
-    public String listar(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        // Verificar autenticación
-        if (session.getAttribute("usuarioLogueado") == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión");
-            return "redirect:/login";
-        }
-        
+    public String listar(Model model) {
         model.addAttribute("lstUnidades", unidadService.listar());
         model.addAttribute("unidadRequestDto", new UnidadRequestDto());
         return "listUnidad";
     }
-    
+
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute UnidadRequestDto unidadRequestDto, 
-                         HttpSession session,
-                         RedirectAttributes redirectAttributes,
-                         Model model) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
+    public String guardar(@ModelAttribute UnidadRequestDto unidadRequestDto,
+                         RedirectAttributes redirectAttributes) {
         try {
             unidadService.crear(unidadRequestDto);
             redirectAttributes.addFlashAttribute("mensaje", "Unidad creada exitosamente");
@@ -53,20 +39,13 @@ public class UnidadController {
             log.error("Error al crear unidad: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/unidades";
     }
-    
+
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Integer id, 
-                        HttpSession session,
+    public String editar(@PathVariable Integer id,
                         RedirectAttributes redirectAttributes,
                         Model model) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             model.addAttribute("unidadRequestDto", unidadService.obtener(id));
             model.addAttribute("lstUnidades", unidadService.listar());
@@ -76,44 +55,28 @@ public class UnidadController {
             redirectAttributes.addFlashAttribute("error", "Unidad no encontrada");
             return "redirect:/unidades";
         }
-        
         return "crudunidades";
     }
-    
+
     @PostMapping("/actualizar")
     public String actualizar(@ModelAttribute UnidadRequestDto unidadRequestDto,
-                           HttpSession session,
                            RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
-            // El ID debe venir en el DTO
             if (unidadRequestDto.getId() == null) {
                 throw new IllegalArgumentException("El ID de la unidad es obligatorio");
             }
-            
             unidadService.actualizar(unidadRequestDto.getId(), unidadRequestDto);
             redirectAttributes.addFlashAttribute("mensaje", "Unidad actualizada exitosamente");
         } catch (Exception e) {
             log.error("Error al actualizar unidad: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/unidades";
     }
-    
+
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id,
-                          HttpSession session,
                           RedirectAttributes redirectAttributes) {
-        
-        if (session.getAttribute("usuarioLogueado") == null) {
-            return "redirect:/login";
-        }
-        
         try {
             unidadService.eliminar(id);
             redirectAttributes.addFlashAttribute("mensaje", "Unidad eliminada exitosamente");
@@ -121,7 +84,6 @@ public class UnidadController {
             log.error("Error al eliminar unidad {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        
         return "redirect:/unidades";
     }
 }

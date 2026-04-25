@@ -29,7 +29,6 @@ public class UsuarioRequestDto {
     @Size(max = 100, message = "El usuario no puede exceder los 100 caracteres")
     private String usuario;
     
-    @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 4, max = 255, message = "La contraseña debe tener entre 4 y 255 caracteres")
     private String password;
     

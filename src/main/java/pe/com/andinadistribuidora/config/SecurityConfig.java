@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -35,6 +37,7 @@ public class SecurityConfig {
     }
 
     // Chain 2 — MVC: form login, sesión, CSRF habilitado
+    /*
     @Bean
     @Order(2)
     public SecurityFilterChain mvcFilterChain(HttpSecurity http,
@@ -67,4 +70,6 @@ public class SecurityConfig {
             );
         return http.build();
     }
+
+     */
 }
